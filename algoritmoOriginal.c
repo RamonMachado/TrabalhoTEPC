@@ -10,17 +10,22 @@ unsigned char *img;
 
 
 //Cabeçalho das funções
-void carregarImagem();
+void carregarImagem(char* nomeImagem);
 void salvarImagem();
 void executarAlgoritmo();
-char inverterBits(char pixel);
+unsigned char inverterBits(unsigned char pixel);
 
 
 //Main
 int main(void){
 	
-	carregarImagem();
-	//executarAlgoritmo();
+	char nomeImagem[300];
+
+	printf("Digite o nome da imagem PNG: ");
+	scanf("%s", nomeImagem);
+
+	carregarImagem(nomeImagem);
+	executarAlgoritmo();
 	salvarImagem();
 
 	return 0;
@@ -28,27 +33,31 @@ int main(void){
 
 
 //Função carrega a imagem e armazena no vetor img.
-void carregarImagem(){
-    img = stbi_load("image.png", &largura, &altura, &canais, 0);
+void carregarImagem(char* nomeImagem){
+    img = stbi_load(nomeImagem, &largura, &altura, &canais, 0);
  	if(img == NULL) {
  		printf("Erro ao carregar a imagem\n");
  		exit(1);
  	}
-	printf("Carregada imagem com largura de %dpx, altura de %dpx e %d canais\n", largura, altura, canais);
+	printf("-- Carregada imagem com largura de %dpx, altura de %dpx e %d canais\n", largura, altura, canais);
 }
 
 //Função salva a imagem nova utilizando o vetor img 
 void salvarImagem(){
-	stbi_write_png("imageNew.png", largura, altura, canais, img, largura * canais);
+	printf("-- Salvando nova imagem como encriptedImage.png\n");
+	stbi_write_png("encriptedImage.png", largura, altura, canais, img, largura * canais);
 	stbi_image_free(img);
+	printf("---- Imagem salva com sucesso!\n");
 }
 
 //Função executa o algoritmo proposto no artigo
 void executarAlgoritmo(){
 
+	printf("-- Executando Algoritmo de Encriptação / Desencriptação\n");
+
 	for(int x = 0; x < largura; x++){
 		for (int y = 0; y < altura; y++){
-			unsigned bytePorPixel = canais;
+			unsigned bytePorPixel = canais;	
 			unsigned char* pixelOffset = img + (y + altura * x) * bytePorPixel;
 			unsigned char r = pixelOffset[0];
 			pixelOffset[0] = inverterBits(r);
@@ -58,14 +67,16 @@ void executarAlgoritmo(){
 			pixelOffset[2] = inverterBits(b);
 			unsigned char a = canais >= 4 ? pixelOffset[3] : 0xff;
 
-			printf("Posição(%d,%d) - R = %d, G = %d, B = %d, A = %d\n", x, y, r, g, b, a);
+			//printf("Posição(%d,%d) - R = %d, G = %d, B = %d, A = %d\n", x, y, r, g, b, a);
 		}
 	}
+
+	printf("---- Algoritmo executado com sucesso!\n");
 }
 
 //Recebe um char e inverte a posição dos 4 MSB com os 4 LSB
-char inverterBits(char pixel){
-	char pixel2 = pixel;
+unsigned char inverterBits(unsigned char pixel){
+	unsigned char pixel2 = pixel;
 	pixel = pixel << 4;
 	pixel2 = pixel2 >> 4;
 
