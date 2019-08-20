@@ -39,7 +39,7 @@ void carregarImagem(){
 
 //Função salva a imagem nova utilizando o vetor img 
 void salvarImagem(){
-	stbi_write_png("imageNew.png", largura, altura, canais, img, largura * canais);
+	stbi_write_jpg("imageNew.jpg", largura, altura, canais, img, 100);
 	stbi_image_free(img);
 }
 
