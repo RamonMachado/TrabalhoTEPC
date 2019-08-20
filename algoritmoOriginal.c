@@ -20,7 +20,7 @@ char inverterBits(char pixel);
 int main(void){
 	
 	carregarImagem();
-	executarAlgoritmo();
+	//executarAlgoritmo();
 	salvarImagem();
 
 	return 0;
@@ -29,7 +29,7 @@ int main(void){
 
 //Função carrega a imagem e armazena no vetor img.
 void carregarImagem(){
-    img = stbi_load("image.jpg", &largura, &altura, &canais, 0);
+    img = stbi_load("image.png", &largura, &altura, &canais, 0);
  	if(img == NULL) {
  		printf("Erro ao carregar a imagem\n");
  		exit(1);
@@ -39,7 +39,7 @@ void carregarImagem(){
 
 //Função salva a imagem nova utilizando o vetor img 
 void salvarImagem(){
-	stbi_write_jpg("imageNew.jpg", largura, altura, canais, img, 100);
+	stbi_write_png("imageNew.png", largura, altura, canais, img, largura * canais);
 	stbi_image_free(img);
 }
 
