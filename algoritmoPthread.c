@@ -87,26 +87,26 @@ void salvarImagem(char* nomeImagem){
 //Função executa o algoritmo proposto no artigo
 void *executarAlgoritmo(void *x){
 
-	int intervalo = (int) floor(altura/NTHREADS);
+	int intervalo = (int) floor(largura/NTHREADS);
 	printf("Intervalo:%d\n", intervalo);
 
 	int tid;
 	tid = *((int *) x);
 
-	int alturaInicio = tid * intervalo;
-	int alturaFim;
+	int larguraInicio = tid * intervalo;
+	int larguraFim;
 
 	if(tid == NTHREADS-1){
-		alturaFim = altura;
+		larguraInicio = largura;
 	}
 	else{
-		alturaFim = alturaInicio + intervalo;
+		larguraFim = larguraInicio + intervalo;
 	}
 
 	printf("-- Executando Algoritmo de Encriptação / Desencriptação\n");
 
-	for(int x = 0; x < largura; x++){
-		for (int y = alturaInicio; y < alturaFim; y++){
+	for(int x = larguraInicio; x < larguraFim; x++){
+		for (int y = 0; y < altura; y++){
 			unsigned bytePorPixel = canais;	
 			unsigned char* pixelOffset = img + (y + altura * x) * bytePorPixel;
 			unsigned char r = pixelOffset[0];
