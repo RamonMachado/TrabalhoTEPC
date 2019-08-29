@@ -69,20 +69,15 @@ void executarAlgoritmo(){
 
 	printf("-- Executando Algoritmo de Encriptação / Desencriptação\n");
 
-	for(int x = 0; x < largura; x++){
-		for (int y = 0; y < altura; y++){
-			unsigned bytePorPixel = canais;	
-			unsigned char* pixelOffset = img + (y + altura * x) * bytePorPixel;
-			unsigned char r = pixelOffset[0];
-			pixelOffset[0] = inverterBits(r);
-			unsigned char g = pixelOffset[1];
-			pixelOffset[1] = inverterBits(g);
-			unsigned char b = pixelOffset[2];
-			pixelOffset[2] = inverterBits(b);
-			//unsigned char a = canais >= 4 ? pixelOffset[3] : 0xff;
+	unsigned char* imgPointer = img;
 
-			//printf("Posição(%d,%d) - R = %d, G = %d, B = %d, A = %d\n", x, y, r, g, b, a);
-		}
+	for(int i = 0; i < largura*altura; i++){
+		*imgPointer = inverterBits(*imgPointer);
+		imgPointer += 1;
+		*imgPointer = inverterBits(*imgPointer);
+		imgPointer += 1;
+		*imgPointer = inverterBits(*imgPointer);
+		imgPointer += 1;
 	}
 
 	printf("---- Algoritmo executado com sucesso!\n");
