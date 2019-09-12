@@ -1,0 +1,21 @@
+-Wallpaper4k
+
+----Algoritmo Sequencial Antigo:
+--------Tempos: 0.175172 - 0.175041 - 0.174840 - 0.175485 - 0.175341
+--------Média:
+
+----Algoritmo Sequencial Novo:
+--------Tempos: 0.145552 - 0.166432 - 0.146482 - 0.145673 - 0.145879
+--------Média:
+
+----Algoritmo Pthread Antigo:
+--------Tempos: 0.175243 - 0.208514 - 0.176061 - 0.191556 - 0.231596
+--------Média:
+
+----Algoritmo Pthread Novo:
+--------Tempos: 
+--------Média:
+
+
+
+- GranTurismo

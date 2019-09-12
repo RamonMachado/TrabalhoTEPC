@@ -2,38 +2,38 @@
 #include <time.h>
 
 #define STB_IMAGE_IMPLEMENTATION
-#include "stb_image/stb_image.h"
+#include "../stb_image/stb_image.h"
 #define STB_IMAGE_WRITE_IMPLEMENTATION
-#include "stb_image/stb_image_write.h"
+#include "../stb_image/stb_image_write.h"
 
 //Variáveis globais para facilitar o código
 int largura, altura, canais;
-unsigned char *img;
 
 
 //Cabeçalho das funções
-void carregarImagem(char* nomeImagem);
-void salvarImagem(char* nomeImagem);
-void executarAlgoritmo();
+unsigned char* carregarImagem(char* nomeImagem, unsigned char *img);
+void salvarImagem(char* nomeImagem, unsigned char *img);
+void executarAlgoritmo(unsigned char *img);
 unsigned char inverterBits(unsigned char pixel);
 
 
 //Main
 int main(void){
-	
+
+	unsigned char *img;
 	char nomeImagem[300];
 
 	printf("Digite o nome da imagem PNG (sem .png): ");
 	scanf("%s", nomeImagem);
 
-	carregarImagem(nomeImagem);
+	img = carregarImagem(nomeImagem, img);
 	
 	clock_t inicio = clock();
-	executarAlgoritmo();
+	executarAlgoritmo(img);
 	clock_t fim = clock();
 	double tempo = ((double) fim - inicio) / CLOCKS_PER_SEC;
 
-	salvarImagem(nomeImagem);
+	salvarImagem(nomeImagem, img);
 
 	printf("\n\n--O algoritmo demorou %f segundos para ser executado.\n\n", tempo);
 
@@ -42,9 +42,9 @@ int main(void){
 
 
 //Função carrega a imagem e armazena no vetor img.
-void carregarImagem(char* nomeImagem){
+unsigned char* carregarImagem(char* nomeImagem, unsigned char* img){
 	char caminho[350];
-	sprintf(caminho, "images/%s.png", nomeImagem);
+	sprintf(caminho, "../images/%s.png", nomeImagem);
 	printf("%s\n", caminho);
     img = stbi_load(caminho, &largura, &altura, &canais, 0);
  	if(img == NULL) {
@@ -52,12 +52,13 @@ void carregarImagem(char* nomeImagem){
  		exit(1);
  	}
 	printf("-- Carregada imagem com largura de %dpx, altura de %dpx e %d canais\n", largura, altura, canais);
+	return img;
 }
 
 //Função salva a imagem nova utilizando o vetor img 
-void salvarImagem(char* nomeImagem){
+void salvarImagem(char* nomeImagem, unsigned char* img){
 	char caminho[350];
-	sprintf(caminho, "encripted/%sEncripted.png", nomeImagem);
+	sprintf(caminho, "encripted-algoritmoSequencial/%sEncripted.png", nomeImagem);
 	printf("-- Salvando nova imagem como %sEncripted.png\n", nomeImagem);
 	stbi_write_png(caminho, largura, altura, canais, img, largura * canais);
 	stbi_image_free(img);
@@ -65,11 +66,11 @@ void salvarImagem(char* nomeImagem){
 }
 
 //Função executa o algoritmo proposto no artigo
-void executarAlgoritmo(){
+void executarAlgoritmo(unsigned char* img){
 
 	printf("-- Executando Algoritmo de Encriptação / Desencriptação\n");
 
-	unsigned char* imgPointer = img;
+	unsigned char *imgPointer = img;
 
 	for(int i = 0; i < largura*altura; i++){
 		*imgPointer = inverterBits(*imgPointer);
