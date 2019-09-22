@@ -4,13 +4,15 @@
 #include <stdlib.h>
 #include "util.c"
 
-#define NTHREADS 1
+#define NTHREADS 2
+#define CACHELINESIZE 64
 
 typedef struct parametros{
 	int threadId;
 	unsigned char* imagem;
 	int largura;
 	int altura;
+	int canais;
 } PARAMETROS;
 
 void *executarAlgoritmo(void *x);
@@ -34,15 +36,16 @@ int main(void){
 	clock_t inicio = clock();
 
   	for(int i = 0; i < NTHREADS; ++i){
-  		PARAMETROS thread_args = {
-  			.threadId = i,
-  			.imagem = img,
-  			.largura = largura,
-  			.altura = altura
-  		};
+  		PARAMETROS* params = (PARAMETROS*) malloc(sizeof(PARAMETROS));
+  		  	params->threadId = i;
+  			params->imagem = img;
+  			params->largura = largura;
+  			params->altura = altura;
+  			params->canais = canais;
+		
 		//unsigned char* thread_args = img;
 		printf("\n-Iniciando a thread %d\n", i);
-		rc = pthread_create(&threads[i], NULL, executarAlgoritmo, (void *) &thread_args);
+		rc = pthread_create(&threads[i], NULL, executarAlgoritmo, (void *) params);
     }	
 
     //Aguardando as threads terminarem
@@ -66,19 +69,26 @@ void *executarAlgoritmo(void *x){
 
 	printf("-- Executando Algoritmo de Encriptação / Desencriptação\n");
 
-	PARAMETROS* params = (PARAMETROS*) x;
+	PARAMETROS *params = (PARAMETROS*) x;
+	printf("Thread %d\n", params->threadId);
 
 	//unsigned char *imgPointer = x;
+	int start = params->threadId * CACHELINESIZE;
+	int end = start + CACHELINESIZE;
+	int i = start;
 
-	for(int i = 0; i < params->largura * params->altura; i++){
-		*params->imagem = inverterBits(*params->imagem);
-		params->imagem += 1;
-		*params->imagem = inverterBits(*params->imagem);
-		params->imagem += 1;
-		*params->imagem = inverterBits(*params->imagem);
-		params->imagem += 1;
+	while(i < params->largura * params->altura * params->canais){
+		//printf("i = %d | thread = %d\n", i, params->threadId);
+		params->imagem[i] = inverterBits(params->imagem[i]);
+		i++;
+		if(i == end){
+			start = start + (NTHREADS * CACHELINESIZE);
+			end = start + CACHELINESIZE;
+			i = start;
+		}
 	}
 
+	free(params);
 	printf("---- Algoritmo executado com sucesso!\n\n");
 
 	return NULL;
