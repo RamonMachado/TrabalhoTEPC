@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include "util.c"
 
-#define NTHREADS 2
+#define NTHREADS 4
 #define CACHELINESIZE 64
 
 typedef struct parametros{
