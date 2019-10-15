@@ -6,24 +6,19 @@
 
 #define NTHREADS 4
 #define CACHELINESIZE 64
-#define OFFSET 4 * 64
+#define OFFSET (NTHREADS * CACHELINESIZE)
 
-typedef struct parametros{
-	int threadId;
-	unsigned char* imagem;
-	int largura;
-	int altura;
-	int canais;
-} PARAMETROS;
+unsigned char *img;
+int largura, altura, canais;
 
 void *executarAlgoritmo(void *x);
 
 //Main
 int main(void){
 	
-	unsigned char *img;
+	
 	char nomeImagem[300];
-	int largura, altura, canais;
+	
 
 	printf("Digite o nome da imagem PNG (sem .png): ");
 	scanf("%s", nomeImagem);
@@ -31,20 +26,16 @@ int main(void){
 	img = carregarImagem(nomeImagem, img, &largura, &altura, &canais);
 
 	pthread_t threads[NTHREADS];
+	int thread_args[NTHREADS];
   	int rc;
 
   	//Relógio começa a contar quando o algoritmo começa
 	clock_t inicio = clock();
 
   	for(int i = 0; i < NTHREADS; ++i){
-  		PARAMETROS* params = (PARAMETROS*) malloc(sizeof(PARAMETROS));
-  		  	params->threadId = i;
-  			params->imagem = img;
-  			params->largura = largura;
-  			params->altura = altura;
-  			params->canais = canais;
+  		thread_args[i] = i;
 		
-		rc = pthread_create(&threads[i], NULL, executarAlgoritmo, (void *) params);
+		rc = pthread_create(&threads[i], NULL, executarAlgoritmo, (void *) &thread_args[i]);
     }	
 
     //Aguardando as threads terminarem
@@ -66,16 +57,16 @@ int main(void){
 //Função executa o algoritmo proposto no artigo
 void *executarAlgoritmo(void *x){
 
-	PARAMETROS *params = (PARAMETROS*) x;
+	int tid = *((int *)x);
 
-	int start = params->threadId * CACHELINESIZE;
+	int start = tid * CACHELINESIZE;
 	int end = start + CACHELINESIZE;
-	int i = start;
-	int totalSize = params->largura * params->altura * params->canais;
+	int totalSize = largura * altura * canais;
+	int i;
 
 	while(1){
 		for(i = start; i < end; i++){
-			params->imagem[i] = inverterBits(params->imagem[i]);
+			img[i] = inverterBits(img[i]);
 		}
 		start = start + OFFSET;
 		if(start > totalSize){
@@ -86,8 +77,6 @@ void *executarAlgoritmo(void *x){
 			end = totalSize;
 		}
 	}
-
-	free(params);
 
 	return NULL;
 }
