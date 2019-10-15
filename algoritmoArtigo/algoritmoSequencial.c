@@ -33,8 +33,6 @@ int main(void){
 //Função executa o algoritmo proposto no artigo
 void executarAlgoritmo(unsigned char* img, int largura, int altura){
 
-	printf("-- Executando Algoritmo de Encriptação / Desencriptação\n");
-
 	unsigned char *imgPointer = img;
 
 	for(int i = 0; i < largura*altura; i++){
@@ -45,6 +43,4 @@ void executarAlgoritmo(unsigned char* img, int largura, int altura){
 		*imgPointer = inverterBits(*imgPointer);
 		imgPointer += 1;
 	}
-
-	printf("---- Algoritmo executado com sucesso!\n");
 }

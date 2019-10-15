@@ -6,6 +6,7 @@
 
 #define NTHREADS 4
 #define CACHELINESIZE 64
+#define OFFSET 4 * 64
 
 typedef struct parametros{
 	int threadId;
@@ -43,8 +44,6 @@ int main(void){
   			params->altura = altura;
   			params->canais = canais;
 		
-		//unsigned char* thread_args = img;
-		printf("\n-Iniciando a thread %d\n", i);
 		rc = pthread_create(&threads[i], NULL, executarAlgoritmo, (void *) params);
     }	
 
@@ -67,29 +66,28 @@ int main(void){
 //Função executa o algoritmo proposto no artigo
 void *executarAlgoritmo(void *x){
 
-	printf("-- Executando Algoritmo de Encriptação / Desencriptação\n");
-
 	PARAMETROS *params = (PARAMETROS*) x;
-	printf("Thread %d\n", params->threadId);
 
-	//unsigned char *imgPointer = x;
 	int start = params->threadId * CACHELINESIZE;
 	int end = start + CACHELINESIZE;
 	int i = start;
+	int totalSize = params->largura * params->altura * params->canais;
 
-	while(i < params->largura * params->altura * params->canais){
-		//printf("i = %d | thread = %d\n", i, params->threadId);
-		params->imagem[i] = inverterBits(params->imagem[i]);
-		i++;
-		if(i == end){
-			start = start + (NTHREADS * CACHELINESIZE);
-			end = start + CACHELINESIZE;
-			i = start;
+	while(1){
+		for(i = start; i < end; i++){
+			params->imagem[i] = inverterBits(params->imagem[i]);
+		}
+		start = start + OFFSET;
+		if(start > totalSize){
+			break;
+		}
+		end = start + CACHELINESIZE;
+		if(end > totalSize){
+			end = totalSize;
 		}
 	}
 
 	free(params);
-	printf("---- Algoritmo executado com sucesso!\n\n");
 
 	return NULL;
 }
