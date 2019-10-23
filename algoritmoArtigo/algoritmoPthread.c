@@ -16,7 +16,10 @@ void *executarAlgoritmo(void *x);
 //Main
 int main(void){
 	
-	
+	struct timespec start, end;
+
+	unsigned char *img;
+
 	char nomeImagem[300];
 	
 
@@ -30,7 +33,7 @@ int main(void){
   	int rc;
 
   	//Relógio começa a contar quando o algoritmo começa
-	clock_t inicio = clock();
+	clock_gettime(CLOCK_MONOTONIC, &start); 
 
   	for(int i = 0; i < NTHREADS; ++i){
   		thread_args[i] = i;
@@ -44,12 +47,14 @@ int main(void){
   	}
 
   	//Relógio termina de contar após o fim do algoritmo
-	clock_t fim = clock();
-	double tempo = ((double) fim - inicio) / CLOCKS_PER_SEC;
+	clock_gettime(CLOCK_MONOTONIC, &end); 
+	double time_taken; 
+    time_taken = (end.tv_sec - start.tv_sec) * 1e9; 
+    time_taken = (time_taken + (end.tv_nsec - start.tv_nsec)) * 1e-9; 
 
 	salvarImagem(nomeImagem, img, largura, altura, canais);
 
-	printf("\n\n-- O algoritmo demorou %f segundos para ser executado.\n\n", tempo);
+	printf("\n\n-- O algoritmo demorou %f segundos para ser executado.\n\n", time_taken);
 
 	return 0;
 }
