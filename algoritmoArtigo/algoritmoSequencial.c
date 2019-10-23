@@ -13,19 +13,25 @@ int main(void){
 	int largura, altura, canais;
 	char nomeImagem[300];
 
+	struct timespec start, end;
+
 	printf("Digite o nome da imagem PNG (sem .png): ");
 	scanf("%s", nomeImagem);
 
 	img = carregarImagem(nomeImagem, img, &largura, &altura, &canais);
 
-	clock_t inicio = clock();
+	clock_gettime(CLOCK_MONOTONIC, &start); 
+
 	executarAlgoritmo(img, largura, altura);
-	clock_t fim = clock();
-	double tempo = ((double) fim - inicio) / CLOCKS_PER_SEC;
+	
+	clock_gettime(CLOCK_MONOTONIC, &end); 
+	double time_taken; 
+    time_taken = (end.tv_sec - start.tv_sec) * 1e9; 
+    time_taken = (time_taken + (end.tv_nsec - start.tv_nsec)) * 1e-9; 
 
 	salvarImagem(nomeImagem, img, largura, altura, canais);
 
-	printf("\n\n--O algoritmo demorou %f segundos para ser executado.\n\n", tempo);
+	printf("\n\n--O algoritmo demorou %f segundos para ser executado.\n\n", time_taken);
 
 	return 0;
 }
