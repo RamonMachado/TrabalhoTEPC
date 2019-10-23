@@ -10,6 +10,8 @@
 
 unsigned char *img;
 int largura, altura, canais;
+int totalSize;
+int sizePerThread;
 
 void *executarAlgoritmo(void *x);
 
@@ -26,12 +28,13 @@ int main(void){
 
 	img = carregarImagem(nomeImagem, img, &largura, &altura, &canais);
 
+  	//Relógio começa a contar quando o algoritmo começa
+	clock_gettime(CLOCK_MONOTONIC, &start);
 	pthread_t threads[NTHREADS];
 	int thread_args[NTHREADS];
   	int rc;
-
-  	//Relógio começa a contar quando o algoritmo começa
-	clock_gettime(CLOCK_MONOTONIC, &start); 
+	totalSize = largura * altura * canais;
+	sizePerThread = totalSize/NTHREADS; 
 
   	for(int i = 0; i < NTHREADS; ++i){
   		thread_args[i] = i;
@@ -62,23 +65,15 @@ void *executarAlgoritmo(void *x){
 
 	int tid = *((int *)x);
 
-	int start = tid * CACHELINESIZE;
-	int end = start + CACHELINESIZE;
-	int totalSize = largura * altura * canais;
+	int start = tid * sizePerThread;
+	int end = start + sizePerThread;
+	if(end > totalSize){
+		end = totalSize;
+	}
 	int i;
 
-	while(1){
-		for(i = start; i < end; i++){
-			img[i] = inverterBits(img[i]);
-		}
-		start = start + OFFSET;
-		if(start > totalSize){
-			break;
-		}
-		end = start + CACHELINESIZE;
-		if(end > totalSize){
-			end = totalSize;
-		}
+	for(i = start; i < end; i++){
+		img[i] = inverterBits(img[i]);
 	}
 
 	return NULL;
