@@ -18,8 +18,6 @@ int main(void){
 	
 	struct timespec start, end;
 
-	unsigned char *img;
-
 	char nomeImagem[300];
 	
 
