@@ -42,6 +42,7 @@ void executarAlgoritmo(unsigned char* img, int largura, int altura, int canais){
 	unsigned char *imgPointer = img;
 	int totalSize = largura*altura*canais;
 
+	#pragma omp parallel for num_threads(8)
 	for(int i = 0; i < totalSize; i++){
 		img[i] = inverterBits(img[i]);
 	}
