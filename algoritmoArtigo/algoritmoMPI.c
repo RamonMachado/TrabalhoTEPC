@@ -19,44 +19,52 @@ int main(int argc, char *argv[]){
 
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 	MPI_Comm_size(MPI_COMM_WORLD, &num_procs);
-	
+
 	if(rank == 0){
 		img = carregarImagem("gallardo", img, &largura, &altura, &canais);
 	}
 
-	int size_per_proc = (sizeof(img)/sizeof(img[0]))/num_procs;
+	int size_per_proc = (largura*altura*canais)/num_procs;
+
+	printf("Tamanho: %d\n", num_procs);
+
+	fflush(stdout);
+
+	partial_img = malloc(sizeof(unsigned char)*size_per_proc);
+
+	struct timespec start, end;
+
+	clock_gettime(CLOCK_MONOTONIC, &start); 
+
+	printf("Scatter start - %d\n", rank);
 
 	MPI_Scatter(
-		&img,
+		(void *)img,
 		size_per_proc,
 		MPI_UNSIGNED_CHAR,
-		&partial_img,
+		(void *)partial_img,
 		size_per_proc,
 		MPI_UNSIGNED_CHAR,
 		0,
 		MPI_COMM_WORLD
 	);
 
-	struct timespec start, end;
-
-	clock_gettime(CLOCK_MONOTONIC, &start); 
-
-	size_t real_size_per_proc = sizeof(partial_img)/sizeof(partial_img[0]);
-
-	executarAlgoritmo(img, real_size_per_proc);
+	printf("Scatter finish - %d\n", rank);
+	printf("%c - %d", partial_img[0], rank);
+	fflush(stdout);
+	MPI_Barrier(MPI_COMM_WORLD);
+	executarAlgoritmo(partial_img, size_per_proc);
 	
-	if(rank == 0){
-		MPI_Gather(
-			&partial_img,
-			real_size_per_proc,
-			MPI_UNSIGNED_CHAR,
-			&img,
-			real_size_per_proc,
-			MPI_UNSIGNED_CHAR,
-			0,
-			MPI_COMM_WORLD
-		);
-	}
+	MPI_Gather(
+		(void *)partial_img,
+		size_per_proc,
+		MPI_UNSIGNED_CHAR,
+		(void *)img,
+		size_per_proc,
+		MPI_UNSIGNED_CHAR,
+		0,
+		MPI_COMM_WORLD
+	);
 
 	clock_gettime(CLOCK_MONOTONIC, &end); 
 	double time_taken; 
@@ -67,6 +75,8 @@ int main(int argc, char *argv[]){
 
 	printf("\n\n--O algoritmo demorou %f segundos para ser executado.\n\n", time_taken);
 
+	free(partial_img);
+	MPI_Finalize();
 	return 0;
 }
 
