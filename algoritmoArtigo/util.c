@@ -24,7 +24,7 @@ unsigned char* carregarImagem(char* nomeImagem, unsigned char *img, int *largura
 //Função salva a imagem nova utilizando o vetor img 
 void salvarImagem(char* nomeImagem, unsigned char *img, int largura, int altura, int canais){
 	char caminho[350];
-	sprintf(caminho, "%sEncriptedInThreads.png", nomeImagem);
+	sprintf(caminho, "%sEncripted.png", nomeImagem);
 	printf("-- Salvando nova imagem como %sEncripted.png\n", nomeImagem);
 	stbi_write_png(caminho, largura, altura, canais, img, largura * canais);
 	stbi_image_free(img);

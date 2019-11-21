@@ -15,7 +15,7 @@ int main(int argc, char *argv[]){
 	unsigned char *img=NULL;
 	int largura, altura, canais;
 	int rank, num_procs;
-	unsigned char *parcial_img;
+	unsigned char *partial_img;
 
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 	MPI_Comm_size(MPI_COMM_WORLD, &num_procs);
@@ -27,10 +27,10 @@ int main(int argc, char *argv[]){
 	int size_per_proc = (sizeof(img)/sizeof(img[0]))/num_procs;
 
 	MPI_Scatter(
-		img,
+		&img,
 		size_per_proc,
 		MPI_UNSIGNED_CHAR,
-		parcial_img,
+		&partial_img,
 		size_per_proc,
 		MPI_UNSIGNED_CHAR,
 		0,
@@ -41,17 +41,17 @@ int main(int argc, char *argv[]){
 
 	clock_gettime(CLOCK_MONOTONIC, &start); 
 
-	size_t real_size_per_proc = sizeof(parcial_img)/sizeof(parcial_img[0]);
+	size_t real_size_per_proc = sizeof(partial_img)/sizeof(partial_img[0]);
 
 	executarAlgoritmo(img, real_size_per_proc);
 	
 	if(rank == 0){
 		MPI_Gather(
-			&parcial_img,
+			&partial_img,
 			real_size_per_proc,
 			MPI_UNSIGNED_CHAR,
 			&img,
-			num_procs,
+			real_size_per_proc,
 			MPI_UNSIGNED_CHAR,
 			0,
 			MPI_COMM_WORLD
@@ -63,7 +63,7 @@ int main(int argc, char *argv[]){
     time_taken = (end.tv_sec - start.tv_sec) * 1e9; 
     time_taken = (time_taken + (end.tv_nsec - start.tv_nsec)) * 1e-9; 
 
-	salvarImagem("gallardo", img, largura, altura, canais);
+	salvarImagem("imagem", img, largura, altura, canais);
 
 	printf("\n\n--O algoritmo demorou %f segundos para ser executado.\n\n", time_taken);
 
