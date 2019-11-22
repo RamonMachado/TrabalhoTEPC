@@ -26,8 +26,6 @@ int main(int argc, char *argv[]){
 
 	int size_per_proc = (largura*altura*canais)/num_procs;
 
-	printf("Tamanho: %d\n", num_procs);
-
 	fflush(stdout);
 
 	partial_img = malloc(sizeof(unsigned char)*size_per_proc);
@@ -50,11 +48,15 @@ int main(int argc, char *argv[]){
 	);
 
 	printf("Scatter finish - %d\n", rank);
-	printf("%c - %d", partial_img[0], rank);
+	printf("%c - %d\n", partial_img[0], rank);
 	fflush(stdout);
+
+	MPI_Bcast(img, size_per_proc, MPI_UNSIGNED_CHAR, 0, MPI_COMM_WORLD);
 	MPI_Barrier(MPI_COMM_WORLD);
+
+	printf("Executar start - %d\n", rank);
 	executarAlgoritmo(partial_img, size_per_proc);
-	
+	printf("Executar finish, gather start - %d\n", rank);
 	MPI_Gather(
 		(void *)partial_img,
 		size_per_proc,
@@ -65,6 +67,7 @@ int main(int argc, char *argv[]){
 		0,
 		MPI_COMM_WORLD
 	);
+	printf("Gather finish - %d\n", rank);
 
 	clock_gettime(CLOCK_MONOTONIC, &end); 
 	double time_taken; 
