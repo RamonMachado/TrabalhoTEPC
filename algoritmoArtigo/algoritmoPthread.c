@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include "util.c"
 
-#define NTHREADS 4
+#define NTHREADS 8
 #define CACHELINESIZE 64
 #define OFFSET (NTHREADS * CACHELINESIZE)
 

@@ -12,7 +12,7 @@ int main(int argc, char *argv[]){
 
 	MPI_Init(&argc, &argv);
 
-	unsigned char *img=NULL;
+	unsigned char *img = NULL;
 	int largura, altura, canais;
 	int rank, num_procs;
 	unsigned char *partial_img;
@@ -21,12 +21,16 @@ int main(int argc, char *argv[]){
 	MPI_Comm_size(MPI_COMM_WORLD, &num_procs);
 
 	if(rank == 0){
-		img = carregarImagem("gallardo", img, &largura, &altura, &canais);
+		img = carregarImagem("wallpaper4k", img, &largura, &altura, &canais);
 	}
 
 	int size_per_proc = (largura*altura*canais)/num_procs;
 
-	printf("Tamanho: %d\n", num_procs);
+	MPI_Bcast(&size_per_proc, 1, MPI_INT, 0, MPI_COMM_WORLD);
+
+	printf("ID%d - Tamanho do vetor por processo: %d\n", rank, size_per_proc);
+
+	printf("ID%d - Número de processos: %d\n", rank, num_procs);
 
 	fflush(stdout);
 
@@ -36,10 +40,9 @@ int main(int argc, char *argv[]){
 
 	clock_gettime(CLOCK_MONOTONIC, &start); 
 
-	printf("Scatter start - %d\n", rank);
+	printf("ID%d - Iniciando Scatter\n", rank);
 
-	MPI_Scatter(
-		(void *)img,
+	MPI_Scatter((void *)img,
 		size_per_proc,
 		MPI_UNSIGNED_CHAR,
 		(void *)partial_img,
@@ -49,10 +52,12 @@ int main(int argc, char *argv[]){
 		MPI_COMM_WORLD
 	);
 
-	printf("Scatter finish - %d\n", rank);
-	printf("%c - %d", partial_img[0], rank);
+	printf("ID%d - Terminado Scatter\n", rank);
+	printf("ID%d - %c\n", rank, partial_img[0]);
 	fflush(stdout);
+
 	MPI_Barrier(MPI_COMM_WORLD);
+	
 	executarAlgoritmo(partial_img, size_per_proc);
 	
 	MPI_Gather(
@@ -71,11 +76,17 @@ int main(int argc, char *argv[]){
     time_taken = (end.tv_sec - start.tv_sec) * 1e9; 
     time_taken = (time_taken + (end.tv_nsec - start.tv_nsec)) * 1e-9; 
 
-	salvarImagem("imagem", img, largura, altura, canais);
+    if(rank == 0){
+    	salvarImagem("imagem", img, largura, altura, canais);
 
-	printf("\n\n--O algoritmo demorou %f segundos para ser executado.\n\n", time_taken);
+		printf("\n\n--O algoritmo demorou %f segundos para ser executado.\n\n", time_taken);
+    }
+	
 
 	free(partial_img);
+
+	printf("ID%d - Chegou ao final!\n", rank);
+
 	MPI_Finalize();
 	return 0;
 }
