@@ -15,10 +15,10 @@ int main(void){
 
 	struct timespec start, end;
 
-	printf("Digite o nome da imagem PNG (sem .png): ");
-	scanf("%s", nomeImagem);
+	//printf("Digite o nome da imagem PNG (sem .png): ");
+	//scanf("%s", nomeImagem);
 
-	img = carregarImagem(nomeImagem, img, &largura, &altura, &canais);
+	img = carregarImagem("wallpaper4k", img, &largura, &altura, &canais);
 
 	clock_gettime(CLOCK_MONOTONIC, &start); 
 
@@ -29,9 +29,16 @@ int main(void){
     time_taken = (end.tv_sec - start.tv_sec) * 1e9; 
     time_taken = (time_taken + (end.tv_nsec - start.tv_nsec)) * 1e-9; 
 
-	salvarImagem(nomeImagem, img, largura, altura, canais);
+	salvarImagem("imagem", img, largura, altura, canais);
 
-	printf("\n\n--O algoritmo demorou %f segundos para ser executado.\n\n", time_taken);
+	//printf("\n\n--O algoritmo demorou %f segundos para ser executado.\n\n", time_taken);
+
+	FILE * file;
+    	file = fopen("Sequencial_stats.txt", "a");
+
+    	fprintf(file, "%f\n", time_taken);
+
+    	fclose(file);
 
 	return 0;
 }
