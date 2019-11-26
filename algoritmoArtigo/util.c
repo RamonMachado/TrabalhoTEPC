@@ -26,7 +26,7 @@ void salvarImagem(char* nomeImagem, unsigned char *img, int largura, int altura,
 	char caminho[350];
 	sprintf(caminho, "%sEncripted.png", nomeImagem);
 	printf("-- Salvando nova imagem como %sEncripted.png\n", nomeImagem);
-	stbi_write_png(caminho, largura, altura, canais, img, largura * canais);
+	//stbi_write_png(caminho, largura, altura, canais, img, largura * canais);
 	stbi_image_free(img);
 	printf("---- Imagem salva com sucesso!\n\n");
 }

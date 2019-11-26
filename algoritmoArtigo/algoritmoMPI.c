@@ -28,9 +28,9 @@ int main(int argc, char *argv[]){
 
 	MPI_Bcast(&size_per_proc, 1, MPI_INT, 0, MPI_COMM_WORLD);
 
-	printf("ID%d - Tamanho do vetor por processo: %d\n", rank, size_per_proc);
+	//printf("ID%d - Tamanho do vetor por processo: %d\n", rank, size_per_proc);
 
-	printf("ID%d - Número de processos: %d\n", rank, num_procs);
+	//printf("ID%d - Número de processos: %d\n", rank, num_procs);
 
 	fflush(stdout);
 
@@ -40,7 +40,7 @@ int main(int argc, char *argv[]){
 
 	clock_gettime(CLOCK_MONOTONIC, &start); 
 
-	printf("ID%d - Iniciando Scatter\n", rank);
+	//printf("ID%d - Iniciando Scatter\n", rank);
 
 	MPI_Scatter((void *)img,
 		size_per_proc,
@@ -52,8 +52,8 @@ int main(int argc, char *argv[]){
 		MPI_COMM_WORLD
 	);
 
-	printf("ID%d - Terminado Scatter\n", rank);
-	printf("ID%d - %c\n", rank, partial_img[0]);
+	//printf("ID%d - Terminado Scatter\n", rank);
+	//printf("ID%d - %c\n", rank, partial_img[0]);
 	fflush(stdout);
 
 	MPI_Barrier(MPI_COMM_WORLD);
@@ -79,13 +79,21 @@ int main(int argc, char *argv[]){
     if(rank == 0){
     	salvarImagem("imagem", img, largura, altura, canais);
 
-		printf("\n\n--O algoritmo demorou %f segundos para ser executado.\n\n", time_taken);
+		//printf("\n\n--O algoritmo demorou %f segundos para ser executado.\n\n", time_taken);
+
+    	FILE * file;
+    	file = fopen("MPI_stats.txt", "a");
+
+    	fprintf(file, "%f\n", time_taken);
+
+    	fclose(file);
+
     }
 	
 
 	free(partial_img);
 
-	printf("ID%d - Chegou ao final!\n", rank);
+	//printf("ID%d - Chegou ao final!\n", rank);
 
 	MPI_Finalize();
 	return 0;
