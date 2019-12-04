@@ -7,10 +7,10 @@
 #include "util.h"
 
 //Cabeçalho das funções
-void executarAlgoritmoMPI(unsigned char *img, int total_size);
+void executarAlgoritmoMPI8(unsigned char *img, int total_size);
 
 //Main
-int mpi(char* imageName, int argc, char *argv[]){
+int mpi8(char* imageName, int argc, char *argv[]){
 	// Iniciando MPI
 	int rank, num_procs;
 	MPI_Init(&argc, &argv);
@@ -55,7 +55,7 @@ int mpi(char* imageName, int argc, char *argv[]){
 	MPI_Barrier(MPI_COMM_WORLD);
 	
 	// Execução do algoritmo
-	executarAlgoritmoMPI(partial_img, size_per_proc);
+	executarAlgoritmoMPI8(partial_img, size_per_proc);
 
 	// Reunindo cálculos dos processos
 	MPI_Gather(
@@ -83,7 +83,7 @@ int mpi(char* imageName, int argc, char *argv[]){
     	// Escrevendo resultados
     	char fileName[40] = "MPI_stats_";
 		strcat(fileName, imageName);
-		strcat(fileName, ".txt");
+		strcat(fileName, "_8np.txt");
     	FILE * file;
     	file = fopen(fileName, "a");
     	fprintf(file, "%f\n", time_taken);
@@ -96,7 +96,7 @@ int mpi(char* imageName, int argc, char *argv[]){
 }
 
 //Função executa o algoritmo proposto no artigo
-void executarAlgoritmoMPI(unsigned char* img, int total_size){
+void executarAlgoritmoMPI8(unsigned char* img, int total_size){
 
 	for(int i = 0; i < total_size; i++){
 		img[i] = inverterBits(img[i]);
