@@ -4,9 +4,11 @@
 #include <stdlib.h>
 #include "util.c"
 
-#define NTHREADS 8
+#define NTHREADS 2
 #define CACHELINESIZE 64
 #define OFFSET (NTHREADS * CACHELINESIZE)
+//#define NUM_PIXELS 8294400 //4K
+#define NUM_PIXELS 132710400 //16K
 
 unsigned char *img;
 int largura, altura, canais;
@@ -23,10 +25,11 @@ int main(void){
 	char nomeImagem[300];
 	
 
-	printf("Digite o nome da imagem PNG (sem .png): ");
-	scanf("%s", nomeImagem);
+	//printf("Digite o nome da imagem PNG (sem .png): ");
+	//scanf("%s", nomeImagem);
 
-	img = carregarImagem(nomeImagem, img, &largura, &altura, &canais);
+
+	img = carregarImagem("wallpaper16k", img, &largura, &altura, &canais);
 
   	//Relógio começa a contar quando o algoritmo começa
 	clock_gettime(CLOCK_MONOTONIC, &start);
@@ -65,10 +68,10 @@ void *executarAlgoritmo(void *x){
 
 	int tid = *((int *)x);
 
-	int start = tid * sizePerThread;
-	int end = start + sizePerThread;
-	if(end > totalSize){
-		end = totalSize;
+	int start = tid * NUM_PIXELS;
+	int end = start + NUM_PIXELS;
+	if(end > NUM_PIXELS){
+		end = NUM_PIXELS;
 	}
 	int i;
 

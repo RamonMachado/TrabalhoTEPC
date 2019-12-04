@@ -18,7 +18,7 @@ int main(void){
 	//printf("Digite o nome da imagem PNG (sem .png): ");
 	//scanf("%s", nomeImagem);
 
-	img = carregarImagem("wallpaper4k", img, &largura, &altura, &canais);
+	img = carregarImagem("granturismo", img, &largura, &altura, &canais);
 
 	clock_gettime(CLOCK_MONOTONIC, &start); 
 
@@ -31,7 +31,7 @@ int main(void){
 
 	salvarImagem("imagem", img, largura, altura, canais);
 
-	//printf("\n\n--O algoritmo demorou %f segundos para ser executado.\n\n", time_taken);
+	printf("\n\n--O algoritmo demorou %f segundos para ser executado.\n\n", time_taken);
 
 	FILE * file;
     	file = fopen("Sequencial_stats.txt", "a");
